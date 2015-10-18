@@ -21,7 +21,7 @@ function add_hdiff_links() {
      .after(add_hdiff)
 }
 
-function refresh() {
+function reloadItems() {
   var success = function(data) {
     $("table.table tr").remove()
     $("table.table").html(data)
@@ -33,13 +33,13 @@ function refresh() {
 function getNewItems(){
   $('tr').first().each(function(){
     var epoch = $(this).attr('id').replace(/[^0-9]/g,'');
-    $.get('/after/' + epoch,function(html){
+    $.get('http://haskellnews.org/after/' + epoch,function(html){
       if(html) {
         $('table').prepend(html);
+        add_hdiff_links()
       }
     });
   });
-  add_hdiff_links()
 }
 
 function refreshDates(){
@@ -101,8 +101,8 @@ Date.prototype.relative = function(t2,fix){
  */
 
 $(document).ready(function(){
-  $("#refresh").click(function() { console.log("here"); refresh()  } )
-  refresh();
+  $("#refresh").click(function() { reloadItems()  } )
+  reloadItems();
   refreshDates();
   setInterval(getNewItems,1000 * 60 * 5);
   setInterval(refreshDates,1000);
