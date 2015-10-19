@@ -16,6 +16,18 @@ function add_hdiff(n, oldhtml) {
   }
 }
 
+function toggle_twitter(show) {
+  $("table.table a[href^='https://twitter.com/']").parent().parent().toggle(show)
+}
+
+function toggle_reddit(show) {
+  $("table.table a[href^='https://www.reddit.com/']").parent().parent().toggle(show)
+}
+
+function toggle_haskell_cafe(show) {
+  $("table.table a[href^='https://groups.google.com/']").parent().parent().toggle(show)
+}
+
 function add_hdiff_links() {
   $("table.table a[seen!=1][href^='https://hackage.haskell.org/package/']")
      .after(add_hdiff)
@@ -100,7 +112,45 @@ Date.prototype.relative = function(t2,fix){
  * Main entry point
  */
 
+var urlPrefixes = { 'twitter': "https://twitter.com/",
+                    'reddit': "http://www.reddit.com",
+                    'hackage': 'https://hackage.haskell.org/package/',
+                    'stackoverflow': 'http://stackoverflow.com/',
+                    'haskellcafe': 'https://groups.google.com/',
+                    'lpaste': 'http://lpaste.net/'
+                  }
+var sourceState = {  }
+
+function toggleButton(src, show) {
+  var sel = "#show_" + src
+  if (show) {
+    $(sel).parent().addClass('active')
+  } else {
+    $(sel).parent().removeClass('active')
+  }
+}
+
+function handleToggle(src) {
+  console.log("src:", src)
+  sourceState[src] = !sourceState[src]
+  var show = sourceState[src]
+  var prefix = urlPrefixes[src]
+  $("table.table a[href^='" + prefix + "']").parent().parent().toggle(show)
+  toggleButton(src, show)
+}
+
 $(document).ready(function(){
+  var create_handle = function(src) { return function() { handleToggle(src) } }
+
+  for (var src in urlPrefixes) {
+    if (urlPrefixes.hasOwnProperty(src)) {
+      sourceState[src] = true;
+      var sel = "#show_" + src
+      $(sel).click( create_handle(src) )
+      toggleButton(src, sourceState[src])
+    }
+  }
+
   reloadItems();
   refreshDates();
   setInterval(getNewItems,1000 * 60 * 5);
