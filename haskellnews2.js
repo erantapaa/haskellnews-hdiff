@@ -9,23 +9,11 @@ function add_hdiff(n, oldhtml) {
   if (m) {
     // var hdiffurl = "http://hdiff.luite.com/cgit/" + m[1] + "/diff/"
     var url = "http://hdiff.luite.com/cgit/" + m[1] + "/diff/?tag=" + m[2]
-    return ' <a href="' + url + '" target="_blank">(hdiff)</a> '
+    return ' <a ignore=1 href="' + url + '" target="_blank">(hdiff)</a> '
     // maybe use Δ ?
   } else {
     return ""
   }
-}
-
-function toggle_twitter(show) {
-  $("table.table a[href^='https://twitter.com/']").parent().parent().toggle(show)
-}
-
-function toggle_reddit(show) {
-  $("table.table a[href^='https://www.reddit.com/']").parent().parent().toggle(show)
-}
-
-function toggle_haskell_cafe(show) {
-  $("table.table a[href^='https://groups.google.com/']").parent().parent().toggle(show)
 }
 
 function add_hdiff_links() {
@@ -52,6 +40,10 @@ function getNewItems(){
       }
     });
   });
+  // handleToggle(state) -- uncomment to filter new items according
+  //                        to the current button state
+  //                        otherwise all new items will appear on the page
+  //                        which may not be so bad
 }
 
 function refreshDates(){
@@ -117,9 +109,12 @@ var urlPrefixes = { 'twitter': "https://twitter.com/",
                     'hackage': 'https://hackage.haskell.org/package/',
                     'stackoverflow': 'http://stackoverflow.com/',
                     'haskellcafe': 'https://groups.google.com/',
-                    'lpaste': 'http://lpaste.net/'
+                    'lpaste': 'http://lpaste.net/',
+                    'all': '',
                   }
-var sourceState = {  }
+var sources = [ 'all', 'twitter', 'reddit', 'hackage', 'stackoverflow', 'haskellcafe', 'lpaste' ]
+
+var state = 'all'  // which button is pressed
 
 function toggleButton(src, show) {
   var sel = "#show_" + src
@@ -132,11 +127,19 @@ function toggleButton(src, show) {
 
 function handleToggle(src) {
   console.log("src:", src)
-  sourceState[src] = !sourceState[src]
-  var show = sourceState[src]
+  state = src
+  // toggle the buttons
+  for (var i = 0; i < sources.length; ++i) {
+    var s = sources[i]
+    toggleButton(s, s == src)
+  }
+  // toggle the news items
   var prefix = urlPrefixes[src]
-  $("table.table a[href^='" + prefix + "']").parent().parent().toggle(show)
-  toggleButton(src, show)
+  $("table.table a[href]").not("[ignore]").each(function() {
+    var href = $(this).attr("href")
+    var show = prefix == href.substring(0, prefix.length)
+    $(this).parent().parent().toggle(show)
+  })
 }
 
 $(document).ready(function(){
@@ -144,15 +147,15 @@ $(document).ready(function(){
 
   for (var src in urlPrefixes) {
     if (urlPrefixes.hasOwnProperty(src)) {
-      sourceState[src] = true;
       var sel = "#show_" + src
       $(sel).click( create_handle(src) )
-      toggleButton(src, sourceState[src])
     }
   }
 
   reloadItems();
   refreshDates();
+  state = 'all'
+  toggleButton(state, true)
   setInterval(getNewItems,1000 * 60 * 5);
   setInterval(refreshDates,1000);
 });
