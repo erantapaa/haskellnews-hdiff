@@ -1,5 +1,5 @@
 
-The Haskell News page with hdiff links
+A mash-up of Haskell News and Luite Stegeman's hdiff site.
 
 Synopsis
 ===
