@@ -1,11 +1,11 @@
 
 A mash-up of Haskell News and Luite Stegeman's hdiff site.
 
-Synopsis
-===
+__Synopsis__
 
-    $ open index.html
-    $ open index2.html
+    $ git clone https://github.com/erantapaa/haskellnews-hdiff
+    $ open haskellnews-hdiff/index.html
+    $ open haskellnews-hdiff/index2.html
 
 These are alternate versions of the Haskell News page
 which adds a few convenience features:
