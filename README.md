@@ -1,4 +1,6 @@
 
+Caveat: Only tested on OS X with Safari.
+
 A mash-up of Haskell News and Luite Stegeman's hdiff site.
 
 __Synopsis__
