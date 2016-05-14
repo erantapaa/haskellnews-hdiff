@@ -1,0 +1,73 @@
+#!/usr/local/bin/python
+#
+# This server serves a custom version of the Haskell News
+# web page. The also server acts as a proxy so that the custom
+# pages can access http://haskellnews.org/after/* without
+# being blocked by the CSRF security checks.
+
+import os.path
+import argparse
+from SimpleHTTPServer import SimpleHTTPRequestHandler
+import SocketServer
+import requests
+
+PORT = 8081
+
+HASKELL_NEWS = "http://haskellnews.org"
+
+def is_directory(dirname):
+  if os.path.isdir(dirname):
+    return True
+  raise Exception("Path does not exist or not a directory: {}".format(dirname))
+
+def has_file(dirname, leaf):
+  path = os.path.join(dirname, leaf)
+  if os.path.isfile(path):
+    return True
+  raise Exception("Directory {} does not contain the file '{}'".format(dirname, leaf))
+
+def check_sitedir(root):
+  """Check that a path refers to the correct site directory."""
+  is_directory(root)
+  has_file(root, "index.html")
+  has_file(root, "haskellnews.js")
+
+class MyHandler(SimpleHTTPRequestHandler):
+  def do_GET(self):
+    if self.path.startswith("/after/"):
+      self.proxy(HASKELL_NEWS + self.path)
+    elif self.path.startswith("/grouped"):
+      self.proxy(HASKELL_NEWS + self.path)
+    else:
+      SimpleHTTPRequestHandler.do_GET(self)
+
+  def proxy(self, url):
+    """Proxy a GET request."""
+    r = requests.get(url)
+    self.send_response(r.status_code)
+    self.send_header('Content-type', r.headers['content-type'])
+    self.end_headers()
+    self.wfile.write(r.content)
+
+def main():
+  parser = argparse.ArgumentParser(description="Start the Haskell News proxy server")
+  parser.add_argument('-d', metavar='DIR', help="site root directory")
+  parser.add_argument('-p', metavar='PORT', help="server port", default=8100)
+  args = parser.parse_args()
+
+  PORT = args.p
+  dirname = args.d or "./site"
+
+  check_sitedir(dirname)
+  os.chdir(dirname)
+
+  try:
+    httpd = SocketServer.TCPServer(("", PORT), MyHandler)
+    print "Serving site resources from", dirname
+    print "Started server on http://localhost:" + str(PORT) + "/"
+    httpd.serve_forever()
+  except KeyboardInterrupt:
+    print '^C received, shutting down the web server'
+    httpd.socket.close()
+
+main()

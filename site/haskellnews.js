@@ -27,13 +27,13 @@ function reloadItems() {
     $("table.table").html(data)
     add_hdiff_links()
   }
-  $.get("http://haskellnews.org/after/1", "", success, "html")
+  $.get("/after/1", "", success, "html")
 }
 
 function getNewItems(){
   $('tr').first().each(function(){
     var epoch = $(this).attr('id').replace(/[^0-9]/g,'');
-    $.get('http://haskellnews.org/after/' + epoch,function(html){
+    $.get('/after/' + epoch,function(html){
       if(html) {
         $('table').prepend(html);
         add_hdiff_links()
