@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/env python
 #
 # This server serves a custom version of the Haskell News
 # web page. The also server acts as a proxy so that the custom
@@ -55,7 +55,7 @@ def main():
   parser.add_argument('-p', metavar='PORT', help="server port", default=8100)
   args = parser.parse_args()
 
-  PORT = args.p
+  PORT = int(args.p)
   dirname = args.d or "./site"
 
   check_sitedir(dirname)
