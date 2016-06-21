@@ -107,12 +107,13 @@ Date.prototype.relative = function(t2,fix){
 var urlPrefixes = { 'twitter': "https://twitter.com/",
                     'reddit': "http://www.reddit.com",
                     'hackage': 'https://hackage.haskell.org/package/',
+                    'github': 'https://github.com/',
                     'stackoverflow': 'http://stackoverflow.com/',
                     'haskellcafe': 'https://groups.google.com/',
                     'lpaste': 'http://lpaste.net/',
                     'all': '',
                   }
-var sources = [ 'all', 'twitter', 'reddit', 'hackage', 'stackoverflow', 'haskellcafe', 'lpaste' ]
+var sources = [ 'all', 'twitter', 'reddit', 'hackage', 'github', 'stackoverflow', 'haskellcafe', 'lpaste' ]
 
 var state = 'all'  // which button is pressed
 
